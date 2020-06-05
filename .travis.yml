@@ -20,7 +20,9 @@ before_install:
   - docker pull confluentinc/cp-zookeeper:5.5.0
   - docker pull confluentinc/cp-kafka:5.5.0
   - docker pull confluentinc/cp-schema-registry:5.5.0
-  - docker pull confluentinc/cp-ksqldb-server:5.5.0
+  - docker pull confluentinc/ksqldb-server:0.9.0
+  - docker pull confluentinc/ksqldb-cli:0.9.0
 
 install:
   - ./gradlew build
+  - cd transforming-ksqldb && ./startClieService.sh && ./runTests.sh
