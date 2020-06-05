@@ -23,6 +23,8 @@ before_install:
   - docker pull confluentinc/ksqldb-server:0.9.0
   - docker pull confluentinc/ksqldb-cli:0.9.0
 
+script:
+  - ./gradlew build 
+
 install:
-  - ./gradlew build
   - cd transforming-ksqldb && sh startCliService.sh && sh runTests.sh
