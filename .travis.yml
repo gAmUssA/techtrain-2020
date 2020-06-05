@@ -25,6 +25,4 @@ before_install:
 
 script:
   - ./gradlew build 
-
-install:
-  - cd transforming-ksqldb && sh startCliService.sh && sh runTests.sh
+  - cd transforming-ksqldb && sh startCliService.sh && sh runTests.sh && cd -
