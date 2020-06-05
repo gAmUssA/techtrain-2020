@@ -3,10 +3,22 @@
   "type": "record",
   "name": "Movie",
   "fields": [
-    {"name": "id", "type": "long"},
-    {"name": "title", "type": "string"},
-    {"name": "release_year", "type": "int"},
-    {"name": "genre", "type": "string"}
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "title",
+      "type": "string"
+    },
+    {
+      "name": "release_year",
+      "type": "int"
+    },
+    {
+      "name": "genre",
+      "type": "string"
+    }
   ]
 }
 

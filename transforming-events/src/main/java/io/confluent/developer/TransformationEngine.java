@@ -1,8 +1,5 @@
 package io.confluent.developer;
 
-import io.confluent.developer.avro.Movie;
-import io.confluent.developer.avro.RawMovie;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -11,81 +8,84 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.Arrays;
+
+import io.confluent.developer.avro.Movie;
+import io.confluent.developer.avro.RawMovie;
 
 import static java.util.Collections.singletonList;
 
 public class TransformationEngine implements Runnable {
 
-    private String inputTopic;
-    private String outputTopic;
-    private final AtomicBoolean closed = new AtomicBoolean(false);
-    private KafkaConsumer<String, RawMovie> rawConsumer;
-    private KafkaProducer<String, Movie> producer;
+  private String inputTopic;
+  private String outputTopic;
+  private final AtomicBoolean closed = new AtomicBoolean(false);
+  private KafkaConsumer<String, RawMovie> rawConsumer;
+  private KafkaProducer<String, Movie> producer;
 
-    public TransformationEngine(String inputTopic, String outputTopic,
-        KafkaConsumer<String, RawMovie> rawConsumer,
-        KafkaProducer<String, Movie> producer) {
+  public TransformationEngine(String inputTopic, String outputTopic,
+                              KafkaConsumer<String, RawMovie> rawConsumer,
+                              KafkaProducer<String, Movie> producer) {
 
-        this.inputTopic = inputTopic;
-        this.outputTopic = outputTopic;
-        this.rawConsumer = rawConsumer;
-        this.producer = producer;
+    this.inputTopic = inputTopic;
+    this.outputTopic = outputTopic;
+    this.rawConsumer = rawConsumer;
+    this.producer = producer;
 
-    }
+  }
 
-    public void run() {
+  public void run() {
 
-        try {
+    try {
 
-            rawConsumer.subscribe(singletonList(inputTopic));
+      rawConsumer.subscribe(singletonList(inputTopic));
 
-            while (!closed.get()) {
+      while (!closed.get()) {
 
-                ConsumerRecords<String, RawMovie> records = rawConsumer.poll(Duration.ofSeconds(1));
-                for (ConsumerRecord<String, RawMovie> record : records) {
+        ConsumerRecords<String, RawMovie> records = rawConsumer.poll(Duration.ofSeconds(1));
+        for (ConsumerRecord<String, RawMovie> record : records) {
 
-                    Movie movie = convertRawMovie(record.value());
-                    ProducerRecord<String, Movie> transformedRecord =
-                        new ProducerRecord<String, Movie>(outputTopic, movie);
+          Movie movie = convertRawMovie(record.value());
+          ProducerRecord<String, Movie> transformedRecord =
+              new ProducerRecord<String, Movie>(outputTopic, movie);
 
-                    producer.send(transformedRecord);
-
-                }
-
-            }
-
-        } catch (WakeupException wue) {
-
-            if (!closed.get()) throw wue;
-
-        } finally {
-
-            rawConsumer.close();
-            producer.close();
+          producer.send(transformedRecord);
 
         }
 
-    }
+      }
 
-    public void shutdown() {
+    } catch (WakeupException wue) {
 
-        closed.set(true);
-        rawConsumer.wakeup();
+        if (!closed.get()) {
+            throw wue;
+        }
 
-    }
+    } finally {
 
-    private Movie convertRawMovie(RawMovie rawMovie) {
-
-        String[] titleParts = rawMovie.getTitle().split("::");
-        String title = titleParts[0];
-        int releaseYear = Integer.parseInt(titleParts[1]);
-
-        return new Movie(rawMovie.getId(), title,
-            releaseYear, rawMovie.getGenre());
+      rawConsumer.close();
+      producer.close();
 
     }
+
+  }
+
+  public void shutdown() {
+
+    closed.set(true);
+    rawConsumer.wakeup();
+
+  }
+
+  private Movie convertRawMovie(RawMovie rawMovie) {
+
+    String[] titleParts = rawMovie.getTitle().split("::");
+    String title = titleParts[0];
+    int releaseYear = Integer.parseInt(titleParts[1]);
+
+    return new Movie(rawMovie.getId(), title,
+                     releaseYear, rawMovie.getGenre());
+
+  }
 
 }
