@@ -69,9 +69,6 @@ services:
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.9.0
     container_name: ksqldb-cli
-    depends_on:
-      - broker
-      - ksqldb-server
     entrypoint: /bin/sh
     environment:
       KSQL_CONFIG_DIR: "/etc/ksqldb"
