@@ -1,0 +1,5 @@
+= I don’t always test my streams, but when I do, I do it in production! 
+
+image:https://travis-ci.org/gAmUssA/techtrain-2020.svg?branch=master["Build Status", link="https://travis-ci.org/gAmUssA/techtrain-2020"]
+
+image::images/banner.png[]
