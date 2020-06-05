@@ -12,6 +12,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.Network;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,8 +33,9 @@ public class TransformEventsTest {
   private final static Properties ENVIRONMENT_PROPERTIES = loadEnvironmentProperties();
 
   @ClassRule
-  public static KafkaContainer kafkaContainer = new KafkaContainer(
-      ENVIRONMENT_PROPERTIES.getProperty("confluent.version"));
+  public static KafkaContainer kafkaContainer =
+      new KafkaContainer(ENVIRONMENT_PROPERTIES.getProperty("confluent.version"))
+          .withNetwork(Network.newNetwork());
 
   @Rule
   public SchemaRegistryContainer schemaRegistryContainer =
